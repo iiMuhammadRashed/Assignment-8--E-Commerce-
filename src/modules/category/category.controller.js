@@ -68,6 +68,7 @@ const updateCategory = asyncErrorHandler(async (req, res, next) => {
       req.file.path,
       {
         folder: `E-Commerce Application/categories/`,
+        public_id: uuidv4(),
       },
       async (err, res) => {
         if (err) return next(new AppError(err, 400));
