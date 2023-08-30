@@ -13,8 +13,4 @@ const deleteBrandValidation = Joi.object({
   id: Joi.string().hex().length(24).required(),
 });
 
-export {
-  addBrandValidation,
-  updateBrandValidation,
-  deleteBrandValidation,
-};
+export { addBrandValidation, updateBrandValidation, deleteBrandValidation };

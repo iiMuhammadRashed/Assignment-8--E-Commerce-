@@ -8,7 +8,7 @@ const addSubCategoryValidation = Joi.object({
 const updateSubCategoryValidation = Joi.object({
   id: Joi.string().hex().length(24).required(),
   name: Joi.string().min(3).max(15),
-  category: Joi.string().hex().length(24).required(),
+  category: Joi.string().hex().length(24),
 });
 
 const deleteSubCategoryValidation = Joi.object({

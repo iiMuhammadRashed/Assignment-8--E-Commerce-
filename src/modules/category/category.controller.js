@@ -55,10 +55,14 @@ const getCategory = asyncErrorHandler(async (req, res, next) => {
 const updateCategory = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
   let Category = await categoryModel.findById(id);
-  if (Category.name == req.body.name.toLowerCase())
-    return next(new AppError(`New name match old name`, 400));
-  if (await categoryModel.findOne({ name: req.body.name.toLowerCase() }))
-    return next(new AppError(`Name is already exist`, 400));
+  if (!Category) return next(new AppError(`No Category found`, 404));
+  if (req.body.name) {
+    if (Category.name == req.body.name.toLowerCase())
+      return next(new AppError(`New name match old name`, 400));
+    if (await categoryModel.findOne({ name: req.body.name.toLowerCase() }))
+      return next(new AppError(`Name is already exist`, 400));
+    req.body.slug = slugify(req.body.name);
+  }
   if (req.file) {
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
@@ -69,15 +73,14 @@ const updateCategory = asyncErrorHandler(async (req, res, next) => {
         if (err) return next(new AppError(err, 400));
       }
     );
-    if (Category.logo) await cloudinary.uploader.destroy(Category.image.public_id);
+    if (Category.image)
+      await cloudinary.uploader.destroy(Category.image.public_id);
     req.body.image = { secure_url, public_id };
   }
-  req.body.slug = slugify(req.body.name);
   let updatedCategory = await categoryModel.findByIdAndUpdate(id, req.body, {
     new: true,
   });
-  if (!Category) return next(new AppError(`No Category found`, 404));
-  Category &&
+  updatedCategory &&
     res.status(200).json({ message: 'success', Category: updatedCategory });
 });
 

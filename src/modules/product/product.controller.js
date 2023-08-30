@@ -72,6 +72,13 @@ const updateProduct = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
   let Product = await productModel.findById(id);
   if (!Product) return next(new AppError(`No Product found`, 404));
+  if (req.body.title) {
+    if (Product.name == req.body.title.toLowerCase())
+      return next(new AppError(`New name match old name`, 400));
+    if (await productModel.findOne({ name: req.body.title.toLowerCase() }))
+      return next(new AppError(`Name is already exist`, 400));
+    req.body.slug = slugify(req.body.title);
+  }
   if (req.files.coverImage) {
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.files.coverImage[0].path,
@@ -106,7 +113,6 @@ const updateProduct = asyncErrorHandler(async (req, res, next) => {
     imgsArr.splice(req.body.imageIndex, 1, { secure_url, public_id });
     req.body.images = imgsArr;
   }
-  if (req.body.title) req.body.slug = slugify(req.body.title);
   let updatedProduct = await productModel.findByIdAndUpdate(id, req.body, {
     new: true,
   });

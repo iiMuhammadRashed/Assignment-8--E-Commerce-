@@ -44,6 +44,13 @@ const updateBrand = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
   let Brand = await brandModel.findById(id);
   if (!Brand) return next(new AppError(`No Brand found`, 404));
+  if (req.body.name) {
+    if (Brand.name == req.body.name.toLowerCase())
+      return next(new AppError(`New name match old name`, 400));
+    if (await brandModel.findOne({ name: req.body.name.toLowerCase() }))
+      return next(new AppError(`Name is already exist`, 400));
+    req.body.slug = slugify(req.body.name);
+  }
   if (req.file) {
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       req.file.path,
@@ -58,7 +65,6 @@ const updateBrand = asyncErrorHandler(async (req, res, next) => {
     if (Brand.logo) await cloudinary.uploader.destroy(Brand.logo.public_id);
     req.body.logo = { secure_url, public_id };
   }
-  req.body.slug = slugify(req.body.name);
   let updatedBrand = await brandModel.findByIdAndUpdate(id, req.body, {
     new: true,
   });

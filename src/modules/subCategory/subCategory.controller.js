@@ -48,21 +48,28 @@ const getSubCategory = asyncErrorHandler(async (req, res, next) => {
 
 const updateSubCategory = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
+  let SubCategory = await subCategoryModel.findById(id);
+  if (!SubCategory) return next(new AppError(`No SubCategory found`, 404));
+  if (req.body.name) {
+    if (SubCategory.name == req.body.name.toLowerCase())
+      return next(new AppError(`New name match old name`, 400));
+    if (await subCategoryModel.findOne({ name: req.body.name.toLowerCase() }))
+      return next(new AppError(`Name is already exist`, 400));
+    req.body.slug = slugify(req.body.name);
+  }
   if (req.body.category) {
     let isCategoryExist = await categoryModel.findById(req.body.category);
     if (!isCategoryExist) return next(new AppError(`Invalid Category`, 404));
   }
-  if (req.body.name) {
-    let isNameExist = await subCategoryModel.findOne({ name: req.body.name });
-    if (isNameExist)
-      return next(new AppError(`The SubCategory name is already is use`, 409));
-    req.body.name = slugify(req.body.name);
-  }
-  let SubCategory = await subCategoryModel.findByIdAndUpdate(id, req.body, {
-    new: true,
-  });
-  if (!SubCategory) return next(new AppError(`No SubCategory found`, 404));
-  SubCategory && res.status(200).json({ message: 'success', SubCategory });
+  let updatedSubCategory = await subCategoryModel.findByIdAndUpdate(
+    id,
+    req.body,
+    {
+      new: true,
+    }
+  );
+  updatedSubCategory &&
+    res.status(200).json({ message: 'success', updatedSubCategory });
 });
 
 const deleteSubCategory = asyncErrorHandler(async (req, res, next) => {
