@@ -11,5 +11,3 @@ bootstrap(app);
 connection();
 app.use(globalErrorHandler);
 app.listen(port, () => console.log(` app listening on port 4000!`));
-
-export default app;
