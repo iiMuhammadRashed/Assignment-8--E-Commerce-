@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const userSchema = new Schema(
   {
-    userName: {
+    username: {
       type: String,
       trim: true,
       unique: true,
@@ -47,7 +48,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
-
     role: {
       type: String,
       enum: ['admin', 'user'],
@@ -66,5 +66,17 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
+
+userSchema.pre('save', function () {
+  this.password = bcrypt.hashSync(this.password, +process.env.SALT_ROUNDS);
+});
+
+userSchema.pre('findOneAndUpdate', function () {
+  if (this._update.password)
+    this._update.password = bcrypt.hashSync(
+      this._update.password,
+      +process.env.SALT_ROUNDS
+    );
+});
 
 export const userModel = model('user', userSchema);

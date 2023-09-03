@@ -2,6 +2,7 @@ import brandRouter from './modules/brand/brand.routes.js';
 import categoryRouter from './modules/category/category.routes.js';
 import productRouter from './modules/product/product.routes.js';
 import subCategoryRouter from './modules/subCategory/subCategory.routes.js';
+import userRouter from './modules/user/user.routes.js';
 import morgan from 'morgan';
 import { AppError } from './utils/AppError.js';
 export function bootstrap(app) {
@@ -10,6 +11,7 @@ export function bootstrap(app) {
   app.use('/api/v1/subCategories', subCategoryRouter);
   app.use('/api/v1/brands', brandRouter);
   app.use('/api/v1/products', productRouter);
+  app.use('/api/v1/users', userRouter);
   app.all('*', (req, res, next) => {
     next(new AppError(`Invalid endpoint ${req.originalUrl}`, 404));
   });
