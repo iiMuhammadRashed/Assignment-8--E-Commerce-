@@ -5,20 +5,15 @@ import subCategoryRouter from './modules/subCategory/subCategory.routes.js';
 import userRouter from './modules/user/user.routes.js';
 import morgan from 'morgan';
 import { AppError } from './utils/AppError.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 export function bootstrap(app, express) {
   app.use(morgan('dev'));
 
   // Static Files
   app.use(express.static('public'));
-  app.use('/css', express.static(__dirname + 'public/css'));
-  app.use('/images', express.static(__dirname + 'public/images'));
-  app.use('/js', express.static(__dirname + 'public/js'));
-  console.log(__dirname);
+  app.use('/css', express.static('public/css'));
+  app.use('/images', express.static('public/images'));
+  app.use('/js', express.static('public/js'));
 
   // Set View
   app.set('views', './views');
