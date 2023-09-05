@@ -60,7 +60,7 @@ const updateUserPassword = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
   let user = await userModel.findByIdAndUpdate(
     id,
-    { password: req.body.password },
+    { password: req.body.password, passwordChangedAt: Date.now() },
     {
       new: true,
     }

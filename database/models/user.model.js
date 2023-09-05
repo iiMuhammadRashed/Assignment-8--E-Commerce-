@@ -29,6 +29,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    passwordChangedAt: Date,
     age: {
       type: Number,
       min: 16,

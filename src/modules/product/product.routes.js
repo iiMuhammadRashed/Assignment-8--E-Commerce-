@@ -7,6 +7,7 @@ import {
   deleteProductValidation,
   updateProductValidation,
 } from './product.validation.js';
+import { allowedTo, protectedRoutes } from '../auth/auth.controller.js';
 
 const productRouter = express.Router();
 productRouter
@@ -19,7 +20,7 @@ productRouter
     validation(addProductValidation),
     PC.addProduct
   )
-  .get(PC.getAllProducts);
+  .get(protectedRoutes, allowedTo('admin'), PC.getAllProducts);
 productRouter
   .route('/:id')
   .get(PC.getProduct)
