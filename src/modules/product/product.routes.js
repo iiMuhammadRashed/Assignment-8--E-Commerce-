@@ -13,6 +13,7 @@ const productRouter = express.Router();
 productRouter
   .route('/')
   .post(
+    protectedRoutes,
     multerCloudinary(allowedTypes.image).fields([
       { name: 'cover', maxCount: 1 },
       { name: 'images', maxCount: 5 },
@@ -25,6 +26,7 @@ productRouter
   .route('/:id')
   .get(PC.getProduct)
   .put(
+    protectedRoutes,
     multerCloudinary(allowedTypes.image).fields([
       { name: 'cover', maxCount: 1 },
       { name: 'image', maxCount: 1 },
@@ -32,6 +34,10 @@ productRouter
     validation(updateProductValidation),
     PC.updateProduct
   )
-  .delete(validation(deleteProductValidation), PC.deleteProduct);
+  .delete(
+    protectedRoutes,
+    validation(deleteProductValidation),
+    PC.deleteProduct
+  );
 
 export default productRouter;

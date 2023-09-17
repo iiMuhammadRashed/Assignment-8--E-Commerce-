@@ -1,4 +1,7 @@
 import { productModel } from '../../../database/models/product.model.js';
+import { brandModel } from '../../../database/models/brand.model.js';
+import { subCategoryModel } from '../../../database/models/subCategory.model.js';
+import { categoryModel } from '../../../database/models/category.model.js';
 import { asyncErrorHandler } from '../../middleware/handleAsyncError.js';
 import slugify from 'slugify';
 import { AppError } from '../../utils/AppError.js';
@@ -7,12 +10,23 @@ import cloudinary from '../../utils/cloudinary.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const addProduct = asyncErrorHandler(async (req, res, next) => {
-  let isExist = await productModel.findOne({ title: req.body.title });
-  if (isExist) return next(new AppError(`The title is already is use`, 409));
-  if (!req.files.coverImage)
+  if (
+    await productModel.findOne({
+      title: req.body.title,
+      createdBy: req.user._id,
+    })
+  )
+    return next(new AppError(`The product is already added`, 409));
+  if (!(await categoryModel.findOne({ _id: req.body.category })))
+    return next(new AppError(`The category is not found`, 404));
+  if (!(await subCategoryModel.findOne({ _id: req.body.subCategory })))
+    return next(new AppError(`The subCategory is not found`, 404));
+  if (!(await brandModel.findOne({ _id: req.body.brand })))
+    return next(new AppError(`The brand is not found`, 404));
+  if (!req.files.cover)
     return next(new AppError(`The Product coverImage is required`, 400));
   const { secure_url, public_id } = await cloudinary.uploader.upload(
-    req.files.coverImage[0].path,
+    req.files.cover[0].path,
     {
       folder: `E-Commerce Application/products/coverImages`,
       public_id: uuidv4(),
@@ -41,6 +55,7 @@ const addProduct = asyncErrorHandler(async (req, res, next) => {
   }
   req.body.images = imgsArr;
   req.body.slug = slugify(req.body.title);
+  req.body.createdBy = req.user._id;
   let Product = new productModel(req.body);
   await Product.save();
   res.status(201).json({ message: 'success', Product });

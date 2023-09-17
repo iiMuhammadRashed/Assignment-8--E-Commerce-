@@ -9,7 +9,7 @@ const addUserValidation = Joi.object({
   rePassword: Joi.string().valid(Joi.ref('password')).required(),
   age: Joi.number().min(16).max(80).required(),
   gender: Joi.string().valid('male', 'female', 'not specific').required(),
-  role: Joi.string().valid('user', 'admin').required(),
+  role: Joi.string().valid('user', 'admin'),
 });
 
 const updateUserValidation = Joi.object({

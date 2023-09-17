@@ -1,4 +1,4 @@
-import { Schema, Types, model } from "mongoose";
+import { Schema, Types, model } from 'mongoose';
 
 const reviewSchema = new Schema(
   {
@@ -6,19 +6,22 @@ const reviewSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: [10, "too short review"],
+      minlength: [8, 'too short review'],
     },
     product: {
       type: Types.ObjectId,
-      ref: "product",
+      ref: 'product',
+      required: true,
     },
     user: {
       type: Types.ObjectId,
-      ref: "user",
+      ref: 'user',
+      required: true,
     },
     rating: {
       type: Number,
       enum: [1, 2, 3, 4, 5],
+      required: true,
     },
   },
   {
@@ -26,4 +29,8 @@ const reviewSchema = new Schema(
   }
 );
 
-export const reviewModel = model("review", reviewSchema);
+reviewSchema.pre(/^find/, function () {
+  this.populate('user', 'username');
+});
+
+export const reviewModel = model('review', reviewSchema);

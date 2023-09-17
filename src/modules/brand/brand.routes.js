@@ -1,9 +1,10 @@
 import express from 'express';
-import * as BC from './brand.controller.js';
+import * as brandController from './brand.controller.js';
 import { allowedTypes, multerCloudinary } from '../../utils/multerCloud.js';
 import { validation } from '../../middleware/validation.js';
 import {
   addBrandValidation,
+  deleteBrandValidation,
   updateBrandValidation,
 } from './brand.validation.js';
 
@@ -14,17 +15,17 @@ brandRouter
   .post(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(addBrandValidation),
-    BC.addBrand
+    brandController.addBrand
   )
-  .get(BC.getAllBrands);
+  .get(brandController.getAllBrands);
 brandRouter
   .route('/:id')
-  .get(BC.getBrand)
+  .get(brandController.getBrand)
   .put(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(updateBrandValidation),
-    BC.updateBrand
+    brandController.updateBrand
   )
-  .delete(BC.deleteBrand);
+  .delete(validation(deleteBrandValidation), brandController.deleteBrand);
 
 export default brandRouter;

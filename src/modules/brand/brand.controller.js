@@ -4,6 +4,7 @@ import slugify from 'slugify';
 import { AppError } from '../../utils/AppError.js';
 import cloudinary from '../../utils/cloudinary.js';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiFeatures } from '../../utils/ApiFeatures.js';
 
 const addBrand = asyncErrorHandler(async (req, res, next) => {
   let isExist = await brandModel.findOne({ name: req.body.name });
@@ -28,9 +29,20 @@ const addBrand = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getAllBrands = asyncErrorHandler(async (req, res, next) => {
-  let Brands = await brandModel.find();
+  let apiFeatures = new ApiFeatures(brandModel.find(), req.query)
+    .paginate()
+    .filter()
+    .sort()
+    .search()
+    .fields();
+  let Brands = await apiFeatures.mongooseQuery;
   if (!Brands.length) return next(new AppError(`No Brands found`, 404));
-  Brands && res.status(200).json({ message: 'success', Brands });
+  Brands &&
+    res.status(200).json({
+      message: 'success',
+      CurrentPage: apiFeatures.PAGE,
+      Brands,
+    });
 });
 
 const getBrand = asyncErrorHandler(async (req, res, next) => {

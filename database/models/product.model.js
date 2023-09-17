@@ -4,7 +4,6 @@ const productSchema = new Schema(
   {
     title: {
       type: String,
-      unique: true,
       required: true,
       trim: true,
       minlength: [5, 'too short product name'],
@@ -13,6 +12,7 @@ const productSchema = new Schema(
     slug: {
       type: String,
       lowercase: true,
+      required: true,
     },
     price: {
       type: Number,
@@ -63,6 +63,11 @@ const productSchema = new Schema(
       ref: 'brand',
       required: [true, 'product brand is required'],
     },
+    createdBy: {
+      type: Types.ObjectId,
+      ref: 'user',
+      required: [true, 'product user is required'],
+    },
     ratingAvg: {
       type: Number,
       min: 1,
@@ -75,7 +80,18 @@ const productSchema = new Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
   }
 );
+
+productSchema.virtual('reviews', {
+  ref: 'review',
+  localField: '_id',
+  foreignField: 'product',
+});
+
+productSchema.pre(/^find/, function () {
+  this.populate('reviews');
+});
 
 export const productModel = model('product', productSchema);
