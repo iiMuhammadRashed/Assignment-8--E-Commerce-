@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const userSchema = new Schema(
@@ -62,6 +62,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    wishlist: [{ type: Types.ObjectId, ref: 'product' }],
   },
   {
     timestamps: true,
