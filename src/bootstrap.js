@@ -6,6 +6,7 @@ import userRouter from './modules/user/user.routes.js';
 import authRouter from './modules/auth/auth.routes.js';
 import reviewRouter from './modules/review/review.routes.js';
 import wishlistRouter from './modules/wishlist/wishlist.routes.js';
+import addressRouter from './modules/address/address.routes.js';
 import morgan from 'morgan';
 import { AppError } from './utils/AppError.js';
 
@@ -35,6 +36,7 @@ export function bootstrap(app, express) {
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/reviews', reviewRouter);
   app.use('/api/v1/wishlist', wishlistRouter);
+  app.use('/api/v1/addresses', addressRouter);
 
   // Does't Exist Endpoints
   app.all('*', (req, res, next) => {
