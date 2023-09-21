@@ -1,6 +1,5 @@
 import { userModel } from '../../../database/models/user.model.js';
 import { asyncErrorHandler } from '../../middleware/handleAsyncError.js';
-import { ApiFeatures } from '../../utils/ApiFeatures.js';
 import { AppError } from '../../utils/AppError.js';
 
 const addWishlist = asyncErrorHandler(async (req, res, next) => {
@@ -12,13 +11,14 @@ const addWishlist = asyncErrorHandler(async (req, res, next) => {
     },
     { new: true }
   );
-  res.status(201).json({ message: 'success', wishlist });
+  res.status(201).json({ message: 'success', wishlist: wishlist.wishlist });
 });
 
 const getAllUserWishlist = asyncErrorHandler(async (req, res, next) => {
   let wishlist = await userModel.findById(req.user._id).populate('wishlist');
   if (!wishlist) return next(new AppError(`No wishlist found`, 404));
-  wishlist && res.status(200).json({ message: 'success', wishlist });
+  wishlist &&
+    res.status(200).json({ message: 'success', wishlist: wishlist.wishlist });
 });
 
 const deleteWishlist = asyncErrorHandler(async (req, res, next) => {
@@ -28,7 +28,8 @@ const deleteWishlist = asyncErrorHandler(async (req, res, next) => {
     { $pull: { wishlist: product } },
     { new: true }
   );
-  wishlist && res.status(200).json({ message: 'success', wishlist });
+  wishlist &&
+    res.status(200).json({ message: 'success', wishlist: wishlist.wishlist });
 });
 
 export { addWishlist, getAllUserWishlist, deleteWishlist };
