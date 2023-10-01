@@ -4,6 +4,7 @@ const addCouponValidation = Joi.object({
   code: Joi.string(),
   expires: Joi.date(),
   discount: Joi.number(),
+  type: Joi.string().valid('fixed', 'percent').required(),
 });
 
 const updateCouponValidation = Joi.object({

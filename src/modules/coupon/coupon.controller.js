@@ -5,6 +5,17 @@ import { ApiFeatures } from '../../utils/ApiFeatures.js';
 import QRCode from 'qrcode';
 
 const addCoupon = asyncErrorHandler(async (req, res, next) => {
+  let isCodeExist = await couponModel.findOne({ code: req.body.code });
+  if (isCodeExist) return next(new AppError(`Code is already exist`, 404));
+  const today = new Date();
+  let newExpireDate = new Date(req.body.expires);
+  console.log(newExpireDate.getHours());
+  newExpireDate.setHours(newExpireDate.getHours() + 24);
+  newExpireDate.setUTCHours(23, 59, 59, 59);
+  if (Date.parse(today) > Date.parse(newExpireDate)) {
+    return next(new AppError(`Expire date cannot be in the past`, 400));
+  }
+  req.body.expires = newExpireDate;
   let coupon = new couponModel(req.body);
   await coupon.save();
   res.status(201).json({ message: 'success', coupon });

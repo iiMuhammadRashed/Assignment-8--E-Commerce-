@@ -76,7 +76,9 @@ const userSchema = new Schema(
 );
 
 userSchema.pre('save', function () {
-  this.password = bcrypt.hashSync(this.password, +process.env.SALT_ROUNDS);
+  if (this.password) {
+    this.password = bcrypt.hashSync(this.password, +process.env.SALT_ROUNDS);
+  }
 });
 
 userSchema.pre('findOneAndUpdate', function () {

@@ -8,6 +8,12 @@ const couponSchema = new Schema(
       required: true,
       trim: true,
     },
+    type: {
+      type: String,
+      enum: ['fixed', 'percent'],
+      default: 'fixed',
+      required: true,
+    },
     expires: {
       type: Date,
       required: true,
