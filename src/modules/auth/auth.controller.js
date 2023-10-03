@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { userModel } from '../../../database/models/user.model.js';
 import { asyncErrorHandler } from '../../middleware/handleAsyncError.js';
 import { AppError } from '../../utils/AppError.js';
-import { sendEmail } from '../../emails/nodeMailer.js';
+import { sendEmail } from '../../emails/mailer.js';
 
 const signUp = asyncErrorHandler(async (req, res, next) => {
   let isEmailExist = await userModel.findOne({ email: req.body.email });
