@@ -9,6 +9,7 @@ import wishlistRouter from './modules/wishlist/wishlist.routes.js';
 import addressRouter from './modules/address/address.routes.js';
 import couponRouter from './modules/coupon/coupon.routes.js';
 import cartRouter from './modules/cart/cart.routes.js';
+import orderRouter from './modules/order/order.routes.js';
 import morgan from 'morgan';
 import { AppError } from './utils/AppError.js';
 
@@ -41,6 +42,7 @@ export function bootstrap(app, express) {
   app.use('/api/v1/addresses', addressRouter);
   app.use('/api/v1/coupons', couponRouter);
   app.use('/api/v1/cart', cartRouter);
+  app.use('/api/v1/orders', orderRouter);
 
   // Does't Exist Endpoints
   app.all('*', (req, res, next) => {
