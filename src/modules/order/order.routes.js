@@ -6,8 +6,17 @@ const orderRouter = express.Router();
 
 orderRouter
   .route('/')
-  .post(protectedRoutes, orderController.createCashOrder)
   .get(protectedRoutes, orderController.getLoggedUserOrders);
+orderRouter.post(
+  '/createCashOrder',
+  protectedRoutes,
+  orderController.createCashOrder
+);
+orderRouter.post(
+  '/createCheckoutSession',
+  protectedRoutes,
+  orderController.createCheckoutSession
+);
 orderRouter.get(
   'getAllOrders',
   protectedRoutes,
