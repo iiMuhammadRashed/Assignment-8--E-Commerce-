@@ -71,9 +71,7 @@ const createCheckoutSession = asyncErrorHandler(async (req, res, next) => {
     mode: 'payment',
     customer_email: req.user.email,
     client_reference_id: cart._id,
-    metadata: {
-      shippingAddress: req.body.shippingAddress,
-    },
+    metadata: req.body.shippingAddress,
     success_url: 'https://www.google.com/',
     cancel_url: 'https://www.google.com/',
   });
