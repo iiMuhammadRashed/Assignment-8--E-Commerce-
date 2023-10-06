@@ -10,10 +10,20 @@ import addressRouter from './modules/address/address.routes.js';
 import couponRouter from './modules/coupon/coupon.routes.js';
 import cartRouter from './modules/cart/cart.routes.js';
 import orderRouter from './modules/order/order.routes.js';
+import { createOnlineOrder } from './modules/order/order.controller.js';
 import morgan from 'morgan';
+import cors from 'cors';
 import { AppError } from './utils/AppError.js';
 
 export function bootstrap(app, express) {
+  // Middleware
+  app.use(cors());
+  app.post(
+    '/webhook',
+    express.raw({ type: 'application/json' }),
+    createOnlineOrder
+  );
+  app.use(express.json());
   app.use(morgan('dev'));
 
   // Static Files
@@ -30,7 +40,6 @@ export function bootstrap(app, express) {
   });
 
   // APIs Endpoints
-  app.use(express.json());
   app.use('/api/v1/categories', categoryRouter);
   app.use('/api/v1/subCategories', subCategoryRouter);
   app.use('/api/v1/brands', brandRouter);

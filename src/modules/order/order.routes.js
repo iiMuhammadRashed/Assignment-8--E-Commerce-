@@ -13,7 +13,7 @@ orderRouter.post(
   orderController.createCashOrder
 );
 orderRouter.post(
-  '/createCheckoutSession',
+  '/checkout',
   protectedRoutes,
   orderController.createCheckoutSession
 );

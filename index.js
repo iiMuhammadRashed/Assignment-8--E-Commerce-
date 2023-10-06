@@ -8,4 +8,6 @@ const port = 4000 || process.env.PORT;
 bootstrap(app, express);
 DBconnection();
 app.use(globalErrorHandler);
-app.listen(port, () => console.log(` app listening on port 4000!`));
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});

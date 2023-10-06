@@ -62,7 +62,7 @@ const createCheckoutSession = asyncErrorHandler(async (req, res, next) => {
           currency: 'egp',
           unit_amount: totalOrderPrice * 100,
           product_data: {
-            name: req.user.userName,
+            name: req.user.username,
           },
         },
         quantity: 1,
@@ -71,16 +71,73 @@ const createCheckoutSession = asyncErrorHandler(async (req, res, next) => {
     mode: 'payment',
     customer_email: req.user.email,
     client_reference_id: cart._id,
+    metadata: {
+      shippingAddress: req.body.shippingAddress,
+    },
     success_url: 'https://www.google.com/',
     cancel_url: 'https://www.google.com/',
-    metadata: req.body.shippingAddress,
   });
   return res.status(201).json({ message: 'success', session });
 });
 
+const createOnlineOrder = asyncErrorHandler(async (req, res, next) => {
+  const sig = req.headers['stripe-signature'].toString();
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    next(new AppError(`Webhook Error:${err.message}`, 404));
+    return;
+  }
+  if (event.type == 'checkout.session.completed') {
+    const checkoutSessionCompleted = event.data.object;
+    const cart = await cartModel.findById(
+      checkoutSessionCompleted.client_reference_id
+    );
+    if (!cart) return next(new AppError(`No cart found`, 404));
+    const totalOrderPrice = cart.totalPriceAfterDiscount
+      ? cart.totalPriceAfterDiscount
+      : cart.totalPrice;
+    let user = userModel.findOne({
+      email: checkoutSessionCompleted.customer_email,
+    });
+    const order = new orderModel({
+      user: user._id,
+      cartItems: cart.cartItems,
+      totalOrderPrice,
+      shippingAddress: checkoutSessionCompleted.metadata.shippingAddress,
+      paymentMethod: 'card',
+      isPaid: true,
+      paidAt: Date.now(),
+    });
+    await order.save();
+
+    if (order) {
+      let options = cart.cartItems.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product },
+          update: { $inc: { stock: -item.quantity, sold: +item.quantity } },
+        },
+      }));
+      await productModel.bulkWrite(options);
+      await cartModel.findByIdAndDelete(cart._id);
+      return res.status(201).json({ message: 'success', order });
+    } else {
+      return next(new AppError(`error in creating order`, 404));
+    }
+  } else {
+    console.log(`Unhandled event type ${event.type}`);
+  }
+});
+
 export {
-  createCashOrder,
   getLoggedUserOrders,
   getAllOrders,
+  createCashOrder,
   createCheckoutSession,
+  createOnlineOrder,
 };
