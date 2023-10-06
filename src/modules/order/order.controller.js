@@ -98,11 +98,9 @@ const createOnlineOrder = asyncErrorHandler(async (req, res, next) => {
       checkoutSessionCompleted.client_reference_id
     );
     if (!cart) return next(new AppError(`No cart found`, 404));
-    let user = userModel.findOne({
-      email: checkoutSessionCompleted.customer_email,
-    });
+
     const order = new orderModel({
-      user: user._id,
+      user: cart.user,
       cartItems: cart.cartItems,
       totalOrderPrice: checkoutSessionCompleted.amount_total / 100,
       shippingAddress: {
