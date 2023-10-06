@@ -106,7 +106,7 @@ const createOnlineOrder = asyncErrorHandler(async (req, res, next) => {
     const order = new orderModel({
       user: user._id,
       cartItems: cart.cartItems,
-      totalOrderPrice,
+      totalOrderPrice: checkoutSessionCompleted.amount_total / 100,
       shippingAddress: checkoutSessionCompleted.metadata.shippingAddress,
       paymentMethod: 'card',
       isPaid: true,
