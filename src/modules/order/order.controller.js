@@ -1,6 +1,7 @@
 import { cartModel } from '../../../database/models/cart.model.js';
 import { orderModel } from '../../../database/models/order.model.js';
 import { productModel } from '../../../database/models/product.model.js';
+import { userModel } from '../../../database/models/user.model.js';
 import { asyncErrorHandler } from '../../middleware/handleAsyncError.js';
 import { AppError } from '../../utils/AppError.js';
 import Stripe from 'stripe';
@@ -59,18 +60,18 @@ const createCheckoutSession = asyncErrorHandler(async (req, res, next) => {
     line_items: [
       {
         price_data: {
-          currency: 'egp',
           unit_amount: totalOrderPrice * 100,
           product_data: {
             name: req.user.username,
           },
+          currency: 'egp',
         },
         quantity: 1,
       },
     ],
     mode: 'payment',
     customer_email: req.user.email,
-    client_reference_id: cart._id,
+    client_reference_id: cart.id,
     metadata: req.body.shippingAddress,
     success_url: 'https://www.google.com/',
     cancel_url: 'https://www.google.com/',
@@ -97,9 +98,6 @@ const createOnlineOrder = asyncErrorHandler(async (req, res, next) => {
       checkoutSessionCompleted.client_reference_id
     );
     if (!cart) return next(new AppError(`No cart found`, 404));
-    const totalOrderPrice = cart.totalPriceAfterDiscount
-      ? cart.totalPriceAfterDiscount
-      : cart.totalPrice;
     let user = userModel.findOne({
       email: checkoutSessionCompleted.customer_email,
     });
