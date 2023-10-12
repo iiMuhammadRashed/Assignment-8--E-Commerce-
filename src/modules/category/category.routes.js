@@ -8,6 +8,7 @@ import {
   updateCategoryValidation,
 } from './category.validation.js';
 import { allowedTypes, multerCloudinary } from '../../utils/multerCloud.js';
+import { protectedRoutes } from '../auth/auth.controller.js';
 
 const categoryRouter = express.Router();
 
@@ -17,17 +18,23 @@ categoryRouter
   .post(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(addCategoryValidation),
+    protectedRoutes,
     CC.addCategory
   )
-  .get(CC.getAllCategories);
+  .get(protectedRoutes, CC.getAllCategories);
 categoryRouter
   .route('/:id')
-  .get(CC.getCategory)
+  .get(protectedRoutes, CC.getCategory)
   .put(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(updateCategoryValidation),
+    protectedRoutes,
     CC.updateCategory
   )
-  .delete(validation(deleteCategoryValidation), CC.deleteCategory);
+  .delete(
+    validation(deleteCategoryValidation),
+    protectedRoutes,
+    CC.deleteCategory
+  );
 
 export default categoryRouter;

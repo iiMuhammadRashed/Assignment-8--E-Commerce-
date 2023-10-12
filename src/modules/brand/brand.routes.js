@@ -7,6 +7,7 @@ import {
   deleteBrandValidation,
   updateBrandValidation,
 } from './brand.validation.js';
+import { protectedRoutes } from '../auth/auth.controller.js';
 
 const brandRouter = express.Router();
 
@@ -15,6 +16,7 @@ brandRouter
   .post(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(addBrandValidation),
+    protectedRoutes,
     brandController.addBrand
   )
   .get(brandController.getAllBrands);
@@ -24,8 +26,13 @@ brandRouter
   .put(
     multerCloudinary(allowedTypes.image).single('image'),
     validation(updateBrandValidation),
+    protectedRoutes,
     brandController.updateBrand
   )
-  .delete(validation(deleteBrandValidation), brandController.deleteBrand);
+  .delete(
+    validation(deleteBrandValidation),
+    protectedRoutes,
+    brandController.deleteBrand
+  );
 
 export default brandRouter;

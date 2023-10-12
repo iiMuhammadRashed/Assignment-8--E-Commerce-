@@ -26,17 +26,17 @@ productRouter
   .route('/:id')
   .get(PC.getProduct)
   .put(
-    protectedRoutes,
     multerCloudinary(allowedTypes.image).fields([
       { name: 'cover', maxCount: 1 },
       { name: 'image', maxCount: 1 },
     ]),
     validation(updateProductValidation),
+    protectedRoutes,
     PC.updateProduct
   )
   .delete(
-    protectedRoutes,
     validation(deleteProductValidation),
+    protectedRoutes,
     PC.deleteProduct
   );
 

@@ -1,5 +1,4 @@
 import { createTransport } from 'nodemailer';
-import { htmlCode } from './html.js';
 
 export const sendEmail = async (options) => {
   const transporter = createTransport({
@@ -13,11 +12,8 @@ export const sendEmail = async (options) => {
   const info = await transporter.sendMail({
     from: `"${process.env.APP_NAME}" <${process.env.NODEMAILER_EMAIL}>`,
     to: options.receiverEmail,
-    subject: 'Email Verification',
-    html: htmlCode(
-      options.username,
-      `${process.env.BASE_URL + 'api/v1/auth/verify/' + options.link}`
-    ),
+    subject: 'E-Commerce App',
+    html: options.html,
   });
   console.log('Message sent: %s', info.messageId);
 };

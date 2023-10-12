@@ -1,9 +1,10 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import { userModel } from '../../../database/models/user.model.js';
 import { asyncErrorHandler } from '../../middleware/handleAsyncError.js';
 import { AppError } from '../../utils/AppError.js';
 import { sendEmail } from '../../emails/mailer.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { confirmEmailHTML } from '../../emails/confirmEmailHTML.js';
 
 const signUp = asyncErrorHandler(async (req, res, next) => {
   let isEmailExist = await userModel.findOne({ email: req.body.email });
@@ -20,7 +21,11 @@ const signUp = asyncErrorHandler(async (req, res, next) => {
   sendEmail({
     username: user.username,
     receiverEmail: user.email,
-    link: verifyToken,
+    message: 'Verify your account',
+    html: confirmEmailHTML(
+      'Verify your account',
+      `${process.env.BASE_URL + 'api/v1/auth/verify/' + verifyToken}`
+    ),
   });
   res.status(201).json({ message: 'success', user, token });
 });
@@ -28,7 +33,9 @@ const signUp = asyncErrorHandler(async (req, res, next) => {
 const signIn = asyncErrorHandler(async (req, res, next) => {
   let user = await userModel.findOne({ email: req.body.email });
   if (!user)
-    return next(new AppError(`Email does't exist , Please login first`, 400));
+    return next(
+      new AppError(`Email does't exist , Please register first`, 404)
+    );
   if (!bcrypt.compareSync(req.body.password, user.password))
     return next(new AppError(`wrong password`, 400));
   let token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);

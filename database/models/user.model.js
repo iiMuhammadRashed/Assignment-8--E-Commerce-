@@ -62,6 +62,9 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    forgetPasswordCode: {
+      type: String,
+    },
     wishlist: [{ type: Types.ObjectId, ref: 'product' }],
     addresses: [
       {

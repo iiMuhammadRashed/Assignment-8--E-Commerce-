@@ -33,9 +33,22 @@ const deleteUserValidation = Joi.object({
   id: Joi.string().hex().length(24).required(),
 });
 
+const sendForgetPasswordCodeValidation = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+const resetPasswordValidation = Joi.object({
+  email: Joi.string().email().required(),
+  code: Joi.string().length(6).required(),
+  newPassword: Joi.string().required(),
+  reNewPassword: Joi.string().valid(Joi.ref('newPassword')).required(),
+});
+
 export {
   addUserValidation,
   updateUserValidation,
   updateUserPasswordValidation,
   deleteUserValidation,
+  sendForgetPasswordCodeValidation,
+  resetPasswordValidation,
 };

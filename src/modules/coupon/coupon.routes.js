@@ -6,18 +6,19 @@ import {
   updateCouponValidation,
   deleteCouponValidation,
 } from './coupon.validation.js';
+import { protectedRoutes } from '../auth/auth.controller.js';
 
 const couponRouter = express.Router({ mergeParams: true });
 
 couponRouter
   .route('/')
-  .post(validation(addCouponValidation), SC.addCoupon)
-  .get(SC.getAllCoupons);
+  .post(validation(addCouponValidation), protectedRoutes, SC.addCoupon)
+  .get(protectedRoutes, SC.getAllCoupons);
 
 couponRouter
   .route('/:id')
-  .get(SC.getCoupon)
-  .put(validation(updateCouponValidation), SC.updateCoupon)
-  .delete(validation(deleteCouponValidation), SC.deleteCoupon);
+  .get(protectedRoutes, SC.getCoupon)
+  .put(validation(updateCouponValidation), protectedRoutes, SC.updateCoupon)
+  .delete(validation(deleteCouponValidation), protectedRoutes, SC.deleteCoupon);
 
 export default couponRouter;

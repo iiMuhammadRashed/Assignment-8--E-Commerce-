@@ -75,6 +75,48 @@ const deleteUser = asyncErrorHandler(async (req, res, next) => {
   user && res.status(200).json({ message: 'success', user });
 });
 
+const sendForgetPasswordCode = asyncErrorHandler(async (req, res, next) => {
+  let user = await userModel.findOne({ email: req.body.email });
+  if (!user)
+    return next(
+      new AppError(`Email does't exist , Please register first`, 404)
+    );
+  let forgetPasswordCode = nanoid(6);
+  user.forgetPasswordCode = forgetPasswordCode;
+  await user.save();
+  sendEmail({
+    username: user.username,
+    receiverEmail: user.email,
+    html: forgetPasswordHTML(`${forgetPasswordCode}`),
+  });
+  user && res.status(200).json({ message: 'success' });
+});
+
+const resetPassword = asyncErrorHandler(async (req, res, next) => {
+  let user = await userModel.findOne({ email: req.body.email });
+  if (!user)
+    return next(
+      new AppError(`Email does't exist , Please register first`, 404)
+    );
+  if (user.forgetPasswordCode !== req.body.code) {
+    return next(new AppError(`Invalid code`, 400));
+  } else {
+    let newCode = nanoid(6);
+    let updatedUser = await userModel.findByIdAndUpdate(
+      user._id,
+      {
+        password: req.body.newPassword,
+        passwordChangedAt: Date.now(),
+        forgetPasswordCode: newCode,
+      },
+      {
+        new: true,
+      }
+    );
+    updatedUser && res.status(200).json({ message: 'success', updatedUser });
+  }
+});
+
 export {
   addUser,
   getAllUsers,
@@ -82,4 +124,6 @@ export {
   updateUser,
   updateUserPassword,
   deleteUser,
+  sendForgetPasswordCode,
+  resetPassword,
 };

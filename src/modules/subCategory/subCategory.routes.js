@@ -6,18 +6,31 @@ import {
   deleteSubCategoryValidation,
   updateSubCategoryValidation,
 } from './subCategory.validation.js';
+import { protectedRoutes } from '../auth/auth.controller.js';
 
 const subCategoryRouter = express.Router({ mergeParams: true });
 
 subCategoryRouter
   .route('/')
-  .post(validation(addSubCategoryValidation), SC.addSubCategory)
+  .post(
+    validation(addSubCategoryValidation),
+    protectedRoutes,
+    SC.addSubCategory
+  )
   .get(SC.getAllSubCategories);
 
 subCategoryRouter
   .route('/:id')
-  .get(SC.getSubCategory)
-  .put(validation(updateSubCategoryValidation), SC.updateSubCategory)
-  .delete(validation(deleteSubCategoryValidation), SC.deleteSubCategory);
+  .get(protectedRoutes, SC.getSubCategory)
+  .put(
+    validation(updateSubCategoryValidation),
+    protectedRoutes,
+    SC.updateSubCategory
+  )
+  .delete(
+    validation(deleteSubCategoryValidation),
+    protectedRoutes,
+    SC.deleteSubCategory
+  );
 
 export default subCategoryRouter;
